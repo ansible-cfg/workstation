@@ -1,0 +1,43 @@
+---
+# Basic
+- import_tasks: user.yaml # Squid depends on fedora user
+
+# Transparent proxy
+- import_tasks: transparent_proxy.yaml
+  when: proxy.install == true
+
+# Basic
+- import_tasks: system_settings.yaml
+- import_tasks: gnome.yaml
+- import_tasks: ntp.yaml
+
+# Containers
+- import_tasks: docker.yaml
+- import_tasks: crio.yaml
+- import_tasks: kubernetes.yaml
+- import_tasks: kubernetes_tools.yaml
+
+# System Monitoring
+- import_tasks: system_monitoring.yaml #Install after docker to avoid docker-common / kubernetes-client conflicts
+- import_tasks: cockpit.yaml
+
+# Dev Tools
+- import_tasks: devtools.yaml
+- import_tasks: buildtools.yaml
+- import_tasks: postman.yaml
+
+# IDEs
+- import_tasks: intellij.yaml
+- import_tasks: vscode.yaml
+
+# Languages / Frameworks
+- import_tasks: angular.yaml
+- import_tasks: golang.yaml
+- import_tasks: golang_software.yaml
+
+# Misc Software
+- import_tasks: spotify.yaml
+- import_tasks: chrome.yaml
+- import_tasks: keepassx.yaml
+- import_tasks: rambox.yaml
+- import_tasks: transcrypt.yaml

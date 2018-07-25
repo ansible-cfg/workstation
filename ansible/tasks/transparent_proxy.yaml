@@ -1,0 +1,149 @@
+- name: Install squid/cntlm
+  dnf:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+  - cntlm
+  - squid
+  when: proxy.use_proxy_for_bootstrap == false
+- name: Install squid/cntlm with proxy
+  dnf:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+  - cntlm
+  - squid
+  environment:
+    http_proxy: "http://{{ proxy.hostname }}:{{ proxy.port }}"
+    https_proxy: "http://{{ proxy.hostname }}:{{ proxy.port }}"
+  when: proxy.use_proxy_for_bootstrap == true and proxy.username == ""
+- name: Install squid/cntlm with proxy and proxy credentials
+  dnf:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+  - cntlm
+  - squid
+  environment:
+    http_proxy: "http://{{ proxy.username }}:{{ proxy.password }}@{{ proxy.hostname }}:{{ proxy.port }}"
+    https_proxy: "http://{{ proxy.username }}:{{ proxy.password }}@{{ proxy.hostname }}:{{ proxy.port }}"
+  when: proxy.use_proxy_for_bootstrap == true and proxy.username != ""
+- name: Create PassNTLMv2
+  shell: echo "{{ proxy.password }}" | cntlm -H -u "{{ proxy.username }}" -d {{ proxy.domain }} | grep PassNTLMv2 | awk '{print $2}'
+  register: passNTLMv2
+- name: Configure cntlm
+  copy:
+    dest: /etc/cntlm.conf
+    content: |
+      Username    {{ proxy.username }}
+      Domain      {{ proxy.domain }}
+      PassNTLMv2  {{ passNTLMv2.stdout }}
+      Proxy       {{ proxy.hostname }}:{{ proxy.port }}
+      Listen      0.0.0.0:3228
+
+      Gateway yes
+      Allow   172.18.0.0/16
+      Allow   127.0.0.0/24
+      Deny    0/0
+- name: Copy tproxy binary
+  copy:
+    src: "../files/tproxy/{{ item.name }}"
+    dest: "{{ item.dest }}"
+    mode: '0740'
+    owner: fedora
+  with_items:
+  - name: tproxy
+    dest: /usr/bin/tproxy
+- name: Copy tproxy scripts
+  template:
+    src: "../files/tproxy/{{ item.name }}"
+    dest: "{{ item.dest }}"
+    mode: '0740'
+    owner: fedora
+  with_items:
+  - name: tproxy-iptables-start.sh
+    dest: /usr/bin/tproxy-iptables-start.sh
+  - name: tproxy-iptables-stop.sh
+    dest: /usr/bin/tproxy-iptables-stop.sh
+- name: Configure tproxy
+  copy: 
+    dest: /etc/systemd/system/tproxy.service
+    content: |      
+      [Unit]
+      Description=TProxy
+      After=network.target
+
+      [Service]
+      User=root
+      Type=simple
+      ExecStartPost=-/usr/bin/tproxy-iptables-start.sh
+      ExecStopPost=-/usr/bin/tproxy-iptables-stop.sh
+      ExecStart=/usr/bin/tproxy -port 3129
+
+      [Install]
+      WantedBy=multi-user.target
+- name: Configure squid
+  copy:
+    dest: /etc/squid/squid.conf
+    content: |      
+      access_log stdio:/var/log/squid/access.log
+
+      http_access allow all
+
+      http_port 0.0.0.0:3128
+      http_port 0.0.0.0:3129 intercept
+      https_port 0.0.0.0:3130 transparent ssl-bump cert=/etc/squid/ssl_cert/myCA.pem
+
+      coredump_dir /var/cache/squid
+
+      cache_peer 127.0.0.1 parent 3228 0 default
+      never_direct allow all
+
+      ssl_bump splice all
+- name: Create cert
+  shell: |
+    # https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit
+    # See Create and initialize TLS certificates cache directory: Squid-4 and newer
+    mkdir -p /etc/squid/ssl_cert /var/spool/squid /var/cache/squid
+    openssl req -new -newkey rsa:2048 -sha256 -days 365000 -nodes -x509 -keyout /etc/squid/ssl_cert/myCA.pem -out /etc/squid/ssl_cert/myCA.pem -subj "/C=DE/ST=BW/CN=squid"
+    /usr/lib64/squid/security_file_certgen -c -s /var/spool/squid/ssl_db -M 4MB
+  args:
+    creates: /var/spool/squid/ssl_db
+- name: Create squid.service.d directory
+  file: 
+    dest: /etc/systemd/system/squid.service.d
+    state: directory
+    recurse: true
+- name: Create squid systemd file
+  copy:
+    content: |
+      [Service]
+      User=root
+      ExecStartPost=/usr/bin/squid-iptables-start.sh
+      ExecStopPost=/usr/bin/squid-iptables-stop.sh
+    dest: /etc/systemd/system/squid.service.d/10-iptables.conf
+- name: squid start/stop scripts for iptables
+  template:
+    src: "../files/squid/{{ item.name }}"
+    dest: "{{ item.dest }}"
+    mode: '0740'
+    owner: fedora
+  with_items:
+    - name: squid-iptables-start.sh
+      dest: /usr/bin/squid-iptables-start.sh
+    - name: squid-iptables-stop.sh
+      dest: /usr/bin/squid-iptables-stop.sh
+- name: Restart/ enable cntlm
+  systemd:
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+    name: cntlm
+  when: proxy.activate == true
+- name: Restart/ enable proxy.type (either tproxy or squid)
+  systemd:
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+    name: "{{ proxy.type }}"
+  when: proxy.activate == true

@@ -1,0 +1,12 @@
+- name: Install packages
+  dnf:
+    name: "{{item}}"
+    state: latest
+  with_items:
+  - jq
+- name: Install packages
+  pip:
+    name: "{{item}}"
+    state: latest
+  with_items:
+  - yq

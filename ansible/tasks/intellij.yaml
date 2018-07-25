@@ -1,0 +1,74 @@
+- name: Create jetbrains directory
+  file: 
+    path: "/home/fedora/opt/jetbrains"
+    state: directory
+  become_user: fedora
+- name: Check for installed Intellij
+  command: ls /home/fedora/opt/jetbrains/idea-IU-{{ intellij.longversion }}
+  ignore_errors: true
+  register: installed
+- name: Check for existing download
+  command: ls /tmp/ideaIU-{{ intellij.version }}.tar.gz
+  ignore_errors: true
+  register: downloaded
+- name: Download Intellij Idea Ultimate
+  when: installed.rc != 0 and downloaded.rc != 0 
+  get_url:
+    url: "https://download-cf.jetbrains.com/idea/ideaIU-{{ intellij.version }}.tar.gz"
+    dest: "/tmp"
+    owner: fedora
+  become_user: fedora
+- name: Extract Intellij Idea Ultimate
+  when: installed.rc != 0 and downloaded.rc != 0 
+  unarchive:
+    src: /tmp/ideaIU-{{ intellij.version }}.tar.gz
+    dest: "/home/fedora/opt/jetbrains"
+    owner: fedora
+  become_user: fedora
+- name: Add Shortcut for Intellij Idea
+  copy:
+    content: |
+      [Desktop Entry]
+      Type=Application
+      Encoding=UTF-8
+      Name=Intellij Idea Ultime Edition
+      Comment=Intellij Idea Ultime Edition
+      Exec=/home/fedora/opt/jetbrains/idea-IU-{{ intellij.longversion }}/bin/idea.sh
+      Icon=/home/fedora/opt/jetbrains/idea-IU-{{ intellij.longversion }}/bin/idea.png
+      Terminal=false
+    dest: /home/fedora/.local/share/applications/intellij_idea.desktop
+  become_user: fedora
+- name: Symlink Intellij
+  file:
+    src: "/home/fedora/opt/jetbrains/idea-IU-{{ intellij.longversion }}/bin/idea.sh"
+    dest: /usr/bin/idea.sh
+    state: link
+
+- name: Check for installed JetBrains Toolbox
+  command: ls /home/fedora/opt/jetbrains/jetbrains-toolbox-{{ intellij.toolbox }}
+  ignore_errors: true
+  register: installed
+- name: Check for existing download
+  command: ls /tmp/jetbrains-toolbox-{{ intellij.toolbox }}.tar.gz
+  ignore_errors: true
+  register: downloaded
+- name: Download JetBrains Toolbox
+  when: installed.rc != 0 and downloaded.rc != 0 
+  get_url:
+    url: "https://download.jetbrains.com/toolbox/jetbrains-toolbox-{{ intellij.toolbox }}.tar.gz"
+    dest: "/tmp"
+    owner: fedora
+  become_user: fedora
+- name: Extract JetBrains Toolbox
+  when: installed.rc != 0 and downloaded.rc != 0 
+  unarchive:
+    src: /tmp/jetbrains-toolbox-{{ intellij.toolbox }}.tar.gz
+    dest: "/home/fedora/opt/jetbrains"
+    owner: fedora
+  become_user: fedora
+- name: Symlink JetBrains Toolbox
+  file:
+    src: "/home/fedora/opt/jetbrains/jetbrains-toolbox-{{ intellij.toolbox }}/jetbrains-toolbox"
+    dest: /usr/bin/jetbrains-toolbox
+    state: link
+

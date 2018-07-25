@@ -1,0 +1,43 @@
+- name: Add Docker repository
+  command: dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+- name: Create docker group
+  group:
+    name: docker
+    gid: "{{ docker.gid }}"
+    state: present
+- name: Install Docker
+  command: dnf -y install docker-ce
+- name: Adding user fedora to group docker
+  user:
+    name: fedora
+    groups: docker
+    append: yes
+- name: Adding user vagrant to group docker
+  user:
+    name: vagrant
+    groups: docker
+    append: yes
+- name: Create /etc/docker Directory
+  file:
+    dest: "/etc/docker"
+    state: directory
+    recurse: true
+- name: Configure Insecure Registries
+  copy:
+    content: |
+      {
+        "insecure-registries" : [ "container.detss.corpintra.net","reg-dhc.app.corpintra.net" ]
+      }
+    dest: /etc/docker/daemon.json
+- name: Enable & start Docker
+  systemd:
+    name: docker
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+- name: Schedule Docker image prune
+  copy:
+    content: |
+      MAILTO=""
+      0 9 * * * root docker image prune -a -f --filter "until=48h" >> /var/log/docker-image-prune.log
+    dest: /etc/cron.d/docker-image-prune

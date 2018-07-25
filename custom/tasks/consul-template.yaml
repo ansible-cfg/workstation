@@ -1,0 +1,24 @@
+- name: Create consule-template directory
+  file: 
+    dest: "/home/fedora/opt/consul-template"
+    state: directory
+    recurse: true
+  become_user: fedora
+- name: Install consul-template
+  unarchive:
+    src: "https://releases.hashicorp.com/consul-template/{{ consul_template.version }}/consul-template_{{ consul_template.version }}_linux_amd64.tgz"
+    dest: "/home/fedora/opt/consul-template"
+    remote_src: yes
+    owner: fedora
+    creates: "/home/fedora/opt/consul-template/consul-template"
+  become_user: fedora
+- name: Symlink consul-template binary /usr/local/bin/consul-template
+  file:
+    src: /home/fedora/opt/consul-template/consul-template
+    dest: /usr/local/bin/consul-template
+    state: link
+- name: Symlink consul-template binary /usr/bin/consul-template
+  file:
+    src: /home/fedora/opt/consul-template/consul-template
+    dest: /usr/bin/consul-template
+    state: link

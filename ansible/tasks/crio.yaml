@@ -1,0 +1,10 @@
+- name: Install CRI-O
+  dnf:
+    name: crio
+    state: latest
+- name: Enable & start CRI-O
+  systemd:
+    state: started
+    enabled: yes
+    daemon_reload: yes
+    name: crio

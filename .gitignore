@@ -1,0 +1,16 @@
+# Misc
+*.local.secret
+
+# Vagrant
+.vagrant
+
+# Intellij
+*.iml
+*.idea
+
+# Ansible
+*.retry
+
+# Tmp
+tmp
+#

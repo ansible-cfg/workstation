@@ -1,0 +1,17 @@
+- name: Set Timezone to Europe/Berlin
+  timezone:
+    name: Europe/Berlin
+- name: Disable swap (for Kubernetes)
+  command: swapoff -a
+- name: Configure vm.max_map_count (for ElasticSearch)
+  copy:
+    content: |
+      vm.max_map_count=262144
+    dest: /etc/sysctl.d/elasticsearch.conf
+- name: Configure fs.inotify.max_user_watches (for Intellij Idea)
+  copy:
+    content: |
+      fs.inotify.max_user_watches = 524288
+    dest: /etc/sysctl.d/idea.conf
+- name: Reload sysctl
+  shell: sysctl -p --system

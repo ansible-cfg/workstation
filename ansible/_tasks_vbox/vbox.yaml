@@ -1,0 +1,40 @@
+- hosts: all
+  connection: local
+  run_once: true
+  become: true
+  vars:
+    vboxversion: "5.2.4"
+  tasks:
+  - name: Check if VirtualBox Extensions are already installed
+    shell: lsmod | grep vboxguest
+    register: vbox_installed
+    ignore_errors: yes
+  - name: Install VirtualBox Extensions prerequisites
+    dnf:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+    - dkms
+    - kernel-devel
+    when: vbox_installed.rc != 0
+  - name: Install VirtualBox Extensions prerequisites
+    shell: |
+      dnf install "kernel-devel-uname-r == $(uname -r)" -y
+    ignore_errors: yes
+    when: vbox_installed.rc != 0
+  - name: Get VBoxGuestAdditions iso
+    get_url:
+      url: "http://download.virtualbox.org/virtualbox/{{ vboxversion }}/VBoxGuestAdditions_{{ vboxversion }}.iso"
+      dest: /tmp/
+    when: vbox_installed.rc != 0
+  - name: Mount VBoxGuestAdditions iso
+    mount:
+      path: /vbox
+      src: "/tmp/VBoxGuestAdditions_{{ vboxversion }}.iso"
+      opts: loop
+      fstype: iso9660
+      state: mounted
+    when: vbox_installed.rc != 0
+  - name: Install VBoxGuestAdditions
+    command: /vbox/VBoxLinuxAdditions.run
+    when: vbox_installed.rc != 0

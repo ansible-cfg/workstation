@@ -1,0 +1,71 @@
+- name: Get Bitbucket ssh key
+  shell: |
+    touch /home/fedora/.ssh/known_hosts
+    ssh-keyscan -p 7999 -H stash.detss.corpintra.net
+  register: stash_ssh_key
+- name: Append Bitbucket ssh key to known_hosts
+  lineinfile:
+    path: /home/fedora/.ssh/known_hosts
+    line: "{{ stash_ssh_key.stdout }}"
+    regexp: "{{ stash_ssh_key.stdout }}"
+    state: present
+
+# to avoid create repositories directories with recurse: true because its unusably slow
+- name: Create Repository base directories
+  file: 
+    path: "{{ item }}"
+    state: directory
+  with_items: "{{ base_folders }}"
+  become_user: fedora
+- name: Create Repository directories
+  file: 
+    path: "{{ base }}/{{ item.folder }}"
+    state: directory
+  with_items: "{{ work.repos }}"
+  become_user: fedora
+- name: Clone Repositories
+  git:
+    repo: '{{ item.repo }}'
+    dest: "{{ base }}/{{ item.folder }}/{{ item.name }}"
+    key_file: "{{ key_file }}"
+  with_items: "{{ work.repos }}"
+  become_user: fedora
+  ignore_errors: yes
+
+# to avoid create go repositories directories with recurse: true because its unusably slow
+- name: Create Go Repository base directories
+  file: 
+    path: "{{ item }}"
+    state: directory
+  with_items: "{{ gopath_base_folders }}"
+  become_user: fedora
+- name: Create Go Repository directories
+  file: 
+    dest: "{{ gopath }}/src/{{ item.folder }}/"
+    state: directory
+  with_items: "{{ work.gorepos }}"
+  become_user: fedora
+- name: Clone Go Repositories
+  git:
+    repo: '{{ item.repo }}'
+    dest: "{{ gopath }}/src/{{ item.folder }}/{{ item.name }}"
+    key_file: "{{ key_file }}"
+  with_items: "{{ work.gorepos }}"
+  become_user: fedora
+  ignore_errors: yes
+
+- name: Symlink Intellij projects
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+  with_items:
+  - src: /home/fedora/code/detss/i3/_doc/.intellij-workspaces/.idea
+    dest: /home/fedora/code/.idea
+  - src: /home/fedora/code/detss/i3/_doc/.intellij-workspaces/gopath-.idea
+    dest: /home/fedora/code/gopath/.idea
+  - src: /home/fedora/code/detss/i3/_doc/.intellij-workspaces/detss-drhub-.idea
+    dest: /home/fedora/code/detss/drhub/.idea
+  - src: /home/fedora/code/detss/i3/_doc/.intellij-workspaces/detss-i3-.idea
+    dest: /home/fedora/code/detss/i3/.idea
+  become_user: fedora

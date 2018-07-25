@@ -1,0 +1,91 @@
+repository:
+  url: "https://github.com/sbueringer/workstation.git" # TODO
+
+proxy:
+  install: true
+  # 1.a Virtual Box with proxy
+  #use_proxy_for_bootstrap: true
+  #activate: true
+  # 1.b Virtual Box without proxy
+  #use_proxy_for_bootstrap: false
+  #activate: false
+  # 2. VMWare with without proxy
+  use_proxy_for_bootstrap: false
+  activate: false
+  
+  # type of the transparent proxy: tproxy or squid
+  type: tproxy
+
+  hostname: "10.0.2.2"
+  port: 3128
+  domain: ""
+  username: ""
+  password: ""
+  # cidrs to be excluded from transparent proxy
+  no_proxy_cidrs:
+  - comment: "Daimler"
+    cidr: 53.0.0.0/8
+
+ntp:
+  server: ntp1.detss.corpintra.net
+
+# Containers
+docker:
+  gid: 11000
+
+minikube:
+  version: 0.25.2
+helm:
+  version: 2.9.1
+kail:
+  version: 0.6.0
+ksonnet:
+  version: 0.8.0
+
+# IDEs
+intellij:
+  version: 2018.1.6
+  longversion: 181.5540.7
+  toolbox: 1.9.3935
+
+# Languages / Frameworks
+nvm:
+  version: 0.33.8
+go:
+  version: 1.10.3
+  software:
+    root: "/home/fedora/go"
+    path: "/home/fedora/gopath"
+    list:
+    # - repo: istio.io/fortio
+    #   bin: fortio
+    - repo: github.com/derekparker/delve/cmd/dlv
+      bin: dlv
+    - repo: github.com/erning/gorun
+      bin: gorun
+    - repo: github.com/rakyll/statik
+      bin: statik
+    - repo: github.com/chrischdi/k8s-ctx-import
+      bin: k8s-ctx-import
+    - repo: github.com/sbueringer/securecookiecli
+      bin: securecookiecli
+    - repo: github.com/spf13/cobra/cobra
+      bin: cobra
+    - repo: github.com/mholt/caddy/caddy
+      bin: caddy  
+    - repo: github.com/golang/dep/cmd/dep
+      bin: dep
+    - repo: github.com/go-swagger/go-swagger/cmd/swagger
+      bin: swagger
+    - repo: github.com/go-task/task/cmd/task
+      bin: task
+    - repo: github.com/google/skicka
+      bin: skicka
+    - repo: github.com/kubernetes-incubator/cri-tools/cmd/crictl
+      bin: crictl
+    - repo: github.com/suntong/cascadia
+      bin: cascadia
+
+# Misc Software
+rambox:
+  version: 0.5.17

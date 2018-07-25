@@ -1,0 +1,12 @@
+- name: Install Transcrypt
+  git:
+    repo: https://github.com/elasticdog/transcrypt.git
+    dest: /home/fedora/opt/transcrypt
+    force: yes
+    version: validate-cypher-fix
+  become_user: fedora
+- name: Symlink Transcrypt
+  file:
+    src: /home/fedora/opt/transcrypt/transcrypt
+    dest: /usr/local/bin/transcrypt
+    state: link

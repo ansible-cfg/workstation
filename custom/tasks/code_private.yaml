@@ -1,0 +1,43 @@
+# to avoid create repositories directories with recurse: true because its unusably slow
+- name: Create Repository base directories
+  file: 
+    path: "{{ item }}"
+    state: directory
+  with_items: "{{ base_folders }}"
+  become_user: fedora
+- name: Create Repository directories
+  file: 
+    path: "{{ base }}/{{ item.folder }}"
+    state: directory
+  with_items: "{{ private.repos }}"
+  become_user: fedora
+- name: Clone Repositories
+  git:
+    repo: '{{ item.repo }}'
+    dest: "{{ base }}/{{ item.folder }}/{{ item.name }}"
+    key_file: "{{ key_file }}"
+  with_items: "{{ private.repos }}"
+  become_user: fedora
+  ignore_errors: yes
+
+# to avoid create go repositories directories with recurse: true because its unusably slow
+- name: Create Go Repository base directories
+  file: 
+    path: "{{ item }}"
+    state: directory
+  with_items: "{{ gopath_base_folders }}"
+  become_user: fedora
+- name: Create Go Repository directories
+  file: 
+    dest: "{{ gopath }}/src/{{ item.folder }}/"
+    state: directory
+  with_items: "{{ private.gorepos }}"
+  become_user: fedora
+- name: Clone Go Repositories
+  git:
+    repo: '{{ item.repo }}'
+    dest: "{{ gopath }}/src/{{ item.folder }}/{{ item.name }}"
+    key_file: "{{ key_file }}"
+  with_items: "{{ private.gorepos }}"
+  become_user: fedora
+  ignore_errors: yes

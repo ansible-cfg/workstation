@@ -1,0 +1,6 @@
+- name: Enable KeepassX copr repo
+  shell: dnf copr enable -y georgespk/keepassx
+- name: Install packages
+  dnf:
+    name: keepassx
+    state: latest

@@ -1,0 +1,85 @@
+- name: Add Microsoft Visual Studio Code Repo
+  copy:
+    content: |
+      [vscode]
+      name=Visual Studio Code
+      baseurl=https://packages.microsoft.com/yumrepos/vscode
+      enabled=1
+      gpgcheck=1
+      gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+    dest: /etc/yum.repos.d/vscode.repo
+- name: Import Microsoft Visual Studio Code gpg keys
+  rpm_key: 
+    key: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+- name: Install Microsoft Visual Studio Code
+  dnf:
+    name: code
+    state: latest
+- name: Create Microsoft Visual Studio Code Settings dir
+  file: 
+    path: "/home/fedora/.config/Code/User"
+    state: directory
+    recurse: true
+  become_user: fedora
+- name: Configure Microsoft Visual Studio Code
+  copy:
+    content: |
+      {
+        "workbench.colorTheme": "Adapta Nokto",
+        "go.toolsGopath": "/home/fedora/gopath",
+        "files.autoSave": "afterDelay",
+        "explorer.confirmDelete": false,
+        "git.confirmSync": false,
+        "git.enableSmartCommit": true,
+        "window.zoomLevel": 1,
+        "gitlens.keymap": "alternate",
+        "gitlens.advanced.messages": {
+          "suppressCommitHasNoPreviousCommitWarning": false,                                                  
+          "suppressCommitNotFoundWarning": false,
+          "suppressFileNotUnderSourceControlWarning": false,                                                  
+          "suppressGitVersionWarning": false,
+          "suppressLineUncommittedWarning": false,
+          "suppressNoRepositoryWarning": false,
+          "suppressResultsExplorerNotice": false,
+          "suppressShowKeyBindingsNotice": true
+        },
+        "gitlens.historyExplorer.enabled": true,
+        "explorer.confirmDragAndDrop": false,
+      }
+    dest: /home/fedora/.config/Code/User/settings.json
+  become_user: fedora
+- name: Configure Microsoft Visual Studio Code Keybindings
+  copy:
+    content: |
+      [
+        {
+          "key": "ctrl+shift+c",
+          "command": "workbench.action.closeEditorsInGroup"                                               
+        }
+      ]     
+    dest: /home/fedora/.config/Code/User/keybindings.json
+  become_user: fedora
+- name: Install Extensions
+  shell: "code --install-extension {{ item }}"
+  with_items:
+  - solarliner.linux-themes
+  - donjayamanne.githistory
+  - eamodio.gitlens
+  - lukehoban.go
+  - PeterJausovec.vscode-docker
+  - heptio.jsonnet
+  - k--kato.intellij-idea-keybindings
+  - ilevine.squash
+  - searKing.preview-vscode
+  - daltonjorge.scala
+  - ms-python.python
+  - anseki.vscode-color
+  become: true
+  become_user: fedora
+- name: Enable jsonnet copr repo (for jsonnet plugin)
+  shell: dnf copr enable -y randomvariable/jsonnet
+- name: Install jsonnet (for jsonnet plugin)
+  dnf: 
+    name: jsonnet
+    state: latest

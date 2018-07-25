@@ -1,0 +1,19 @@
+- name: Add Spotify Repo
+  copy:
+    content: |
+      [fedora-spotify]
+      name=negativo17 - Spotify
+      baseurl=https://negativo17.org/repos/spotify/fedora-$releasever/$basearch/
+      enabled=1
+      skip_if_unavailable=1
+      gpgkey=https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
+      gpgcheck=1
+      enabled_metadata=1
+      metadata_expire=6h
+      type=rpm-md
+      repo_gpgcheck=0
+    dest: /etc/yum.repos.d/google-chrome.repo
+- name: Install Spotify
+  dnf: 
+    name: spotify
+    state: latest

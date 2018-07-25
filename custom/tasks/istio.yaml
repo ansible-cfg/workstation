@@ -1,0 +1,17 @@
+
+# FPM
+
+- name: Install packages
+  dnf:
+    name: "{{item}}"
+    state: latest
+  with_items:
+  - ruby-devel
+  - gcc make
+  - rpm-build
+  - libffi-devel
+- name: Install fpm
+  shell: |
+    gem install --no-ri --no-rdoc fpm
+  become_user: fedora
+

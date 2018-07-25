@@ -1,0 +1,13 @@
+- name: Download  daimler folder from google drive
+  shell: |
+    mkdir -p /home/fedora/.daimler
+    skicka download workstation/files/.daimler /home/fedora/.daimler
+  become_user: fedora
+- name: Add certs to OS and Chrome trust store
+  shell: |
+    sudo cp /home/fedora/.daimler/daimler-ca-bundle-G2.pem /etc/pki/ca-trust/source/anchors/
+    sudo update-ca-trust
+
+    certutil -d sql:$HOME/.pki/nssdb -D -n daimler || echo "Cert does not exist"
+    certutil -d sql:$HOME/.pki/nssdb -A -t "CT,," -n daimler -i /etc/pki/ca-trust/source/anchors/daimler-ca-bundle-G2.pem
+  become_user: fedora

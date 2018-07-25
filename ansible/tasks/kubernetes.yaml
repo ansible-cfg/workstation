@@ -1,0 +1,59 @@
+- name: Add Kubernetes Repo
+  copy:
+    content: |
+      [kubernetes]
+      name=Kubernetes
+      baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+      enabled=1
+      gpgcheck=1
+      repo_gpgcheck=1
+      gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+    dest: /etc/yum.repos.d/kubernetes.repo
+- name: Import Kubernetes gpg keys
+  rpm_key:
+    key: "{{ item }}"
+    state: present
+  with_items:
+    - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+    - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+#TODO add again
+# - name: Install kube, kubeadm, kubectl
+#   dnf:
+#     name: "{{ item }}"
+#     state: latest
+#   with_items:
+#   - kubelet
+#   - kubeadm
+#   - kubectl
+#   - iproute-tc
+- name: Reload and restart Kubernetes
+  systemd:
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+    name: kubelet
+- name: Create directory /home/fedora/opt/kubernetes
+  file:
+    dest: "/home/fedora/opt/kubernetes"
+    state: directory
+    recurse: true
+  become_user: fedora
+- name: Copy Kubernetes scripts
+  copy:
+    src: "../files/kubernetes/{{ item.name }}"
+    dest: "{{ item.dest }}"
+    mode: '0740'
+    owner: fedora
+  with_items:
+    - name: kube_gen_certs.sh
+      dest: /usr/local/bin/kube_gen_certs.sh
+    - name: kube_reset_cluster.sh
+      dest: /usr/local/bin/kube_reset_cluster.sh
+    - name: kube_delete_cluster.sh
+      dest: /usr/local/bin/kube_delete_cluster.sh
+    - name: kube_prepare_env.sh
+      dest: /usr/local/bin/kube_prepare_env.sh
+    - name: calico.yaml
+      dest: /home/fedora/opt/kubernetes/calico.yaml
+    - name: storage.yaml
+      dest: /home/fedora/opt/kubernetes/storage.yaml

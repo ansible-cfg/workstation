@@ -1,0 +1,8 @@
+- name: Install Golang
+  unarchive:
+    src: https://storage.googleapis.com/golang/go{{ go.version }}.linux-amd64.tar.gz
+    dest: "/home/fedora"
+    remote_src: yes
+    owner: fedora
+    creates: "/home/fedora/go"
+  become_user: fedora

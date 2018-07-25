@@ -1,0 +1,7 @@
+- name: Install packages
+  dnf:
+    name: "{{item}}"
+    state: latest
+  with_items:
+  - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-27.noarch.rpm
+  - vlc

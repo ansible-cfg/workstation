@@ -1,0 +1,7 @@
+0.0.0.0:80
+
+browse /
+
+log stdout
+
+errors stdout

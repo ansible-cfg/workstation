@@ -1,0 +1,20 @@
+- name: Install Golang Software
+  command: "bash -c 'go get -u {{ item.repo }}'"
+  args:
+    creates: "{{ go.software.path }}/bin/{{ item.bin }}"
+  with_items: "{{ go.software.list }}"
+  become_user: fedora
+  environment:
+    GOROOT: "{{ go.software.root }}"
+    GOPATH: "{{ go.software.path }}"
+    PATH: "{{ go.software.root }}/bin:{{ ansible_env.PATH }}"
+- name: Symlink crictl
+  file:
+    src: "{{ go.software.path }}/bin/crictl"
+    dest: /usr/bin/crictl
+    state: link
+- name: Symlink dlv
+  file:
+    src: "{{ go.software.path }}/bin/dlv"
+    dest: /usr/bin/dlv
+    state: link

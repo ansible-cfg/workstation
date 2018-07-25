@@ -1,0 +1,20 @@
+- name: Add Virtual Box Repo
+  copy:
+    content: |
+      [virtualbox]
+      name=Fedora $releasever - $basearch - VirtualBox
+      baseurl=http://download.virtualbox.org/virtualbox/rpm/fedora/$releasever/$basearch
+      enabled=1
+      gpgcheck=1
+      repo_gpgcheck=1
+      gpgkey=https://www.virtualbox.org/download/oracle_vbox.asc
+    dest: /etc/yum.repos.d/virtualbox.repo
+- name: Install Virtual Box
+  dnf:
+    name: VirtualBox-5.2
+    state: latest
+- name: Add user fedora to vboxusers group
+  user:
+    name: fedora
+    groups: vboxusers
+    append: yes

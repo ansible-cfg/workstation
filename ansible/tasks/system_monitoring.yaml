@@ -1,0 +1,13 @@
+- name: Install packages
+  dnf:
+    name: "{{item}}"
+    state: latest
+  with_items:
+  - htop
+  - nethogs
+  # dependency for glances
+  - redhat-rpm-config
+  - python2-devel
+- name: Install glances
+  pip:
+    name: glances

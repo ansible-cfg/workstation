@@ -1,0 +1,44 @@
+- name: Install packages
+  dnf:
+    name: "{{item}}"
+    state: latest
+  with_items:
+  - gitg
+- name: Add .gitconfig
+  copy:
+    content: |
+      [include]
+        path = private.gitconfig
+      [includeIf "gitdir/i:**/detss*/**"]
+        path = work.gitconfig
+      [includeIf "gitdir/i:**/t1/**"]
+        path = work.gitconfig
+      [includeIf "gitdir/i:**/git.mercedes-benz.com/**"]
+        path = work.gitconfig
+      [credential]
+        helper = store
+      [user]
+        signingkey = 60D47A0A
+      [commit]
+        gpgsign = true
+      [gpg]
+        program = gpg2
+    dest: /home/fedora/.gitconfig
+- name: Add work.gitconfig
+  copy:
+    content: |
+      [http]
+        sslverify = false
+      [user]
+        name = Bueringer, Stefan (415)
+        email = stefan.bueringer@daimler.com
+    dest: /home/fedora/work.gitconfig
+- name: Add private.gitconfig
+  copy:
+    content: |
+      [http]
+        sslverify = true
+      [user]
+        name = Stefan Bueringer
+        email = sbueringer@gmail.com
+    dest: /home/fedora/private.gitconfig

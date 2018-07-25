@@ -1,0 +1,5 @@
+- name: Upload Intellij Config to gdrive
+  shell: |
+    skicka mkdir workstation/files/.IntelliJIdea2017.3/config
+    skicka upload /home/fedora/.IntelliJIdea2017.3/config workstation/files/.IntelliJIdea2017.3/config
+  become_user: fedora

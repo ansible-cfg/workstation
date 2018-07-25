@@ -1,0 +1,10 @@
+- name: Install packages
+  dnf:
+    name: "{{item}}"
+    state: latest
+  with_items:
+  - "https://prerelease.keybase.io/keybase_amd64.rpm"
+- name: Activate Keybase
+  shell: |
+    run_keybase
+  become_user: fedora

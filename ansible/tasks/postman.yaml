@@ -1,0 +1,38 @@
+- name: Download Postman
+  # From https://blog.bluematador.com/posts/postman-how-to-install-on-ubuntu-1604/
+  get_url:
+    url: "https://dl.pstmn.io/download/latest/linux64"
+    dest: "/tmp/postman_latest.tar.gz"
+    owner: fedora
+  creates: /home/fedora/opt/Postman
+  become_user: fedora
+- name: Extract Postman
+  unarchive:
+    src: "/tmp/postman_latest.tar.gz"
+    dest: "/home/fedora/opt"
+  creates: /home/fedora/opt/Postman
+  become_user: fedora
+- name: Symlink postman binary
+  file:
+    src: /home/fedora/opt/Postman/Postman
+    dest: /usr/local/bin/postman
+    state: link
+- name: Create Desktop Directory
+  file:
+    dest: "/home/fedora/.local/share/applications"
+    state: directory
+    recurse: true
+  become_user: fedora
+- name: Add Shortcut for Postman
+  copy:
+    content: |
+      [Desktop Entry]
+      Type=Application
+      Encoding=UTF-8
+      Name=Postman
+      Comment=Postman
+      Exec=/home/fedora/opt/Postman/Postman
+      Icon=/home/fedora/opt/Postman/resources/app/assets/icon.png
+      Terminal=false
+    dest: /home/fedora/.local/share/applications/postman.desktop 
+  become_user: fedora

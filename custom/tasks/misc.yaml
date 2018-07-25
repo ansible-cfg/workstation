@@ -1,0 +1,22 @@
+- name: Configure fuse
+  lineinfile:
+    path: /etc/fuse.conf
+    regexp: '^.*user_allow_other'
+    line: 'user_allow_other'
+  become: true   
+- name: Setup display usage for root
+  command: xhost local:root 
+  become_user: fedora
+- name: Schedule dnf update
+  copy:
+    content: |
+      MAILTO=""
+      0 10 * * * root dnf -y update >> /var/log/dnf-update.log
+    dest: /etc/cron.d/dnf-update
+- name: Install packages
+  dnf:
+    name: "{{item}}"
+    state: latest
+  with_items:
+  - ImageMagick
+  - pwgen

@@ -1,0 +1,14 @@
+sudo: required
+
+language: generic
+
+services:
+- docker
+
+before_install:
+- chmod +x docker/caddy/build.sh
+- chmod +x docker/squid/build.sh
+
+install:
+- docker/caddy/build.sh
+- docker/squid/build.sh

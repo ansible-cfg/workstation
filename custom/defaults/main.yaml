@@ -1,0 +1,153 @@
+hyper:
+  version: 2.0.0
+
+consul_template:
+  version: 0.19.4
+
+base: "/home/fedora/code"
+base_folders: 
+- /home/fedora/code/detss
+- /home/fedora/code/github.com
+gopath: "/home/fedora/code/gopath"
+gopath_base_folders:
+- /home/fedora/code/gopath/src/github.com
+- /home/fedora/code/gopath/src/git.mercedes-benz.com
+- /home/fedora/code/gopath/src/detss
+- /home/fedora/code/gopath/src/istio.io
+key_file: "/home/fedora/.ssh/id_rsa"
+
+work:
+  repos:
+    # DHC
+    - name: customer_documentation
+      repo: ssh://git@stash.detss.corpintra.net:7999/dhc/customer_documentation.git
+      folder: detss/dhc
+    - name: documentation
+      repo: ssh://git@stash.detss.corpintra.net:7999/dhc/documentation.git
+      folder: detss/dhc
+    - name: stuff
+      repo: ssh://git@stash.detss.corpintra.net:7999/dhc/stuff.git
+      folder: detss/dhc
+    - name: stuff
+      repo: ssh://git@stash.detss.corpintra.net:7999/dhc/stuff.git
+      folder: detss/dhc
+
+    # i3 Main
+    - name: i3-images
+      repo: ssh://git@stash.detss.corpintra.net:7999/i3/i3-images.git
+      folder: detss/i3
+    - name: i3-minikube
+      repo: ssh://git@stash.detss.corpintra.net:7999/i3/i3-minikube.git
+      folder: detss/i3
+    - name: i3-tex-service
+      repo: ssh://git@stash.detss.corpintra.net:7999/i3/i3-tex-service.git
+      folder: detss/i3
+    - name: i3-voting
+      repo: ssh://git@stash.detss.corpintra.net:7999/i3/i3-voting.git
+      folder: detss/i3
+    - name: oneapi-demo
+      repo: ssh://git@stash.detss.corpintra.net:7999/i3/oneapi-demo.git
+      folder: detss/i3
+
+    # i3 Additional
+    - name: i3-ci
+      repo: ssh://git@stash.detss.corpintra.net:7999/i3/i3-ci.git
+      folder: detss/i3
+    - name: i3-documentation
+      repo: ssh://git@stash.detss.corpintra.net:7999/i3/i3-documentation.git
+      folder: detss/i3
+    - name: i3-env
+      repo: ssh://git@stash.detss.corpintra.net:7999/i3/i3-env.git
+      folder: detss/i3
+    - name: i3-lab
+      repo: ssh://git@stash.detss.corpintra.net:7999/i3/i3-lab.git
+      folder: detss/i3
+    - name: i3-secrets
+      repo: ssh://git@stash.detss.corpintra.net:7999/i3/i3-secrets.git
+      folder: detss/i3
+
+    # Private
+    - name: _doc
+      repo: ssh://git@stash.detss.corpintra.net:7999/~sbuerin/doc.git
+      folder: detss/i3
+
+    # Istio
+    - name: istio
+      repo: ssh://git@stash.detss.corpintra.net:7999/drhub/istio.git
+      folder: detss/drhub
+  gorepos:
+    # i3
+    - name: caddy
+      repo: ssh://git@stash.detss.corpintra.net:7999/i3/i3-caddy.git
+      folder: github.com/mholt
+    - name: i3-tex-caddy
+      repo: ssh://git@stash.detss.corpintra.net:7999/i3/i3-tex-caddy.git
+      folder: git.mercedes-benz.com/i3
+
+    # dhc
+    - name: t1
+      repo: ssh://git@stash.detss.corpintra.net:7999/dhc/t1.git
+      folder: detss/dhc
+
+    # DHC-CaaS
+    - name: kubernetes-namespace-controller_docker
+      repo: ssh://git@stash.detss.corpintra.net:7999/dhc/kubernetes-namespace-controller_docker.git
+      folder: git.mercedes-benz.com
+    - name: k8s-ctx-import
+      repo: https://github.com/sbueringer/k8s-ctx-import.git
+      folder: github.com/sbueringer
+
+    # Istio
+    - name: istio
+      repo: https://github.com/istio/istio.git
+      folder: istio.io/istio
+    - name: proxy
+      repo: https://github.com/istio/proxy.git
+      folder: istio.io/istio
+    - name: mixerclient
+      repo: https://github.com/istio/mixerclient.git
+      folder: istio.io/istio
+    - name: fortio
+      repo: https://github.com/istio/fortio.git
+      folder: istio.io/istio
+    - name: api
+      repo: https://github.com/istio/api.git
+      folder: istio.io/istio
+    - name: envoy
+      repo: https://github.com/istio/envoy.git
+      folder: istio.io/istio
+private:
+  repos:
+    # Donkeycar
+    - name: donkeycar
+      repo: https://github.com/sbueringer/donkey
+      folder: github.com/sbueringer
+
+    # Private Github
+    - name: kubectx
+      repo: https://github.com/sbueringer/kubectx.git
+      folder: github.com/sbueringer
+    - name: ml
+      repo: https://github.com/sbueringer/ml.git
+      folder: github.com/sbueringer
+    - name: fastai
+      repo: https://github.com/sbueringer/fastai.git
+      folder: github.com/sbueringer
+    - name: istio-chaos
+      repo: https://github.com/sbueringer/istio-chaos.git
+      folder: github.com/sbueringer
+
+  gorepos:
+    # Private
+    - name: kubewatch
+      repo: https://github.com/sbueringer/kubewatch
+      folder: github.com/bitnami-labs
+    - name: kube-service-etc-hosts-operator
+      repo: https://github.com/sbueringer/kube-service-etc-hosts-operator.git
+      folder: github.com/sbueringer
+    - name: kubernetes-rbacq
+      repo: https://github.com/sbueringer/kubernetes-rbacq.git
+      folder: github.com/sbueringer
+    - name: securecookiecli
+      repo: https://github.com/sbueringer/securecookiecli.git
+      folder: github.com/sbueringer

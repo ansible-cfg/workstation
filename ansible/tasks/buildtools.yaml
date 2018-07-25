@@ -1,0 +1,11 @@
+- name: Enable bazel copr repo
+  shell: dnf copr enable -y vbatts/bazel
+- name: Install packages
+  dnf: name={{item}} state=latest
+  with_items:
+  - bazel
+  - upx
+  # for Envoy:
+  - cmake
+  - libtool
+  - gcc-c++

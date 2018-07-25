@@ -1,0 +1,17 @@
+- name: Get ssh files from gdrive
+  shell: |
+    mkdir -p /home/fedora/.ssh
+    skicka download workstation/files/.ssh /home/fedora/.ssh
+    sudo chmod 0400 /home/fedora/.ssh/id_rsa*
+  args:
+    creates: /home/fedora/.ssh/id_rsa.pub
+- name: Get Keepass from gdrive
+  shell: |
+    mkdir -p /home/fedora/.keepass
+    skicka download KeePass/Database.kdbx /home/fedora/.keepass
+- name: Get gpg files from gdrive
+  shell: |
+    mkdir -p /home/fedora/.gnupg
+    skicka download workstation/files/.gnupg /home/fedora/.gnupg
+  args:
+    creates: /home/fedora/.gnupg/pubring.gpg

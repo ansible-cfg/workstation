@@ -1,0 +1,95 @@
+- name: Create Helm Directory
+  file: 
+    dest: "/home/fedora/opt/helm"
+    state: directory
+    recurse: true
+  become_user: fedora
+- name: Install Helm
+  unarchive:
+    src: "https://storage.googleapis.com/kubernetes-helm/helm-v{{ helm.version }}-linux-amd64.tar.gz"
+    dest: "/home/fedora/opt/helm"
+    remote_src: yes
+    owner: fedora
+  become_user: fedora
+- name: Symlink Helm binary /usr/local/bin/helm
+  file:
+    src: /home/fedora/opt/helm/linux-amd64/helm
+    dest: /usr/local/bin/helm
+    state: link
+- name: Symlink Helm binary /usr/bin/helm
+  file:
+    src: /home/fedora/opt/helm/linux-amd64/helm
+    dest: /usr/bin/helm
+    state: link
+- name: Install Helm Registry Plugin
+  git:
+    repo: https://github.com/app-registry/appr-helm-plugin.git
+    dest: /home/fedora/.helm/plugins/registry
+    force: yes
+  become_user: fedora
+- name: Trigger Helm Registry Binary download
+  shell: helm registry --help
+  become_user: fedora
+- name: Install kube-shell
+  shell: pip-3.6 install kube-shell
+  become: true
+- name: Clone kubectx
+  git:
+    repo: https://github.com/sbueringer/kubectx.git
+    dest: /home/fedora/code/gopath/src/github.com/sbueringer/kubectx
+  become_user: fedora
+- name: Symlink kubectx incl autocompletion
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+  with_items:
+  - src: /home/fedora/code/gopath/src/github.com/sbueringer/kubectx/kubectx
+    dest: /usr/local/bin/kubectx
+  - src: /home/fedora/code/gopath/src/github.com/sbueringer/kubectx/completion/kubectx.zsh
+    dest: /usr/share/zsh/site-functions/_kubectx
+  - src: /home/fedora/code/gopath/src/github.com/sbueringer/kubectx/completion/kcfg.zsh
+    dest: /usr/share/zsh/site-functions/_kcfg
+  - src: /home/fedora/code/gopath/src/github.com/sbueringer/kubectx/completion/kctx.zsh
+    dest: /usr/share/zsh/site-functions/_kctx
+  - src: /home/fedora/code/gopath/src/github.com/sbueringer/kubectx/completion/kns.zsh
+    dest: /usr/share/zsh/site-functions/_kns
+- name: Create kail Directory
+  file: 
+    dest: "/home/fedora/opt/kail"
+    state: directory
+    recurse: true
+  become_user: fedora
+- name: Install kail
+  unarchive:
+    src: "https://github.com/boz/kail/releases/download/v{{ kail.version }}/kail_{{ kail.version }}_linux_amd64.tar.gz"
+    dest: "/home/fedora/opt/kail"
+    remote_src: yes
+    owner: fedora
+    creates: "/home/fedora/opt/kail/kail"
+  become_user: fedora
+- name: Symlink kail
+  file:
+    src: /home/fedora/opt/kail/kail
+    dest: /usr/local/bin/kail
+    state: link
+
+- name: Create ksonnet Directory
+  file: 
+    dest: "/home/fedora/opt/ksonnet"
+    state: directory
+    recurse: true
+  become_user: fedora
+- name: Install ksonnet
+  unarchive:
+    src: "https://github.com/ksonnet/ksonnet/releases/download/v{{ ksonnet.version }}/ks_{{ ksonnet.version }}_linux_amd64.tar.gz"
+    dest: "/home/fedora/opt/ksonnet"
+    remote_src: yes
+    owner: fedora
+    creates: "/home/fedora/opt/ksonnet/ks_{{ ksonnet.version }}_linux_amd64/ks"
+  become_user: fedora
+- name: Symlink ksonnet
+  file:
+    src: "/home/fedora/opt/ksonnet/ks_{{ ksonnet.version }}_linux_amd64/ks"
+    dest: /usr/local/bin/ks
+    state: link

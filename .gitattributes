@@ -1,0 +1,5 @@
+*.secret  filter=crypt diff=crypt
+
+* text          eol=lf
+
+*.sh            text

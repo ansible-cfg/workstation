@@ -1,0 +1,11 @@
+
+# 
+- import_tasks: code.yaml 
+- import_tasks: donkeycar.yaml 
+- import_tasks: gatling.yaml 
+- import_tasks: git.yaml 
+- import_tasks: misc.yaml 
+- import_tasks: shell.yaml 
+
+# execut /workstation/custom/provision.sh to setup skicka
+- import_tasks: skicka.yaml 

@@ -1,0 +1,11 @@
+- name: Install packages
+  dnf:
+    name: "{{item}}"
+    state: latest
+  with_items:
+  - "https://github.com/saenzramiro/rambox/releases/download/{{ rambox.version }}/Rambox-{{ rambox.version }}-x64.rpm"
+- name: Symlink rambox
+  file:
+    src: /opt/Rambox/rambox
+    dest: /usr/bin/rambox
+    state: link

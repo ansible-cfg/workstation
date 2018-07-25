@@ -1,0 +1,82 @@
+- name: Install the 'Fedora Workstation' package group
+  dnf:
+    name: '@Fedora Workstation'
+    state: latest
+- name: Install the 'GNOME' package group
+  dnf:
+    name: '@GNOME'
+    state: latest
+- name: Install Chrome gnome integration
+  dnf:
+    name: chrome-gnome-shell
+    state: latest
+- name: Set graphical.target as default.target
+  command: systemctl set-default graphical.target
+- name: Enable GDM (boot directly to GNOME)
+  systemd:
+    enabled: yes
+    name: gdm
+- name: Setup auto login
+  blockinfile:
+    path: /etc/gdm/custom.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    insertafter: ".*daemon.*"
+    content: |
+      AutomaticLoginEnable = true
+      AutomaticLogin = fedora
+- name: Install GNOME tweak tool
+  dnf:
+    name: gnome-tweak-tool
+    state: latest
+- name: Install dconf editor
+  dnf:
+    name: dconf-editor
+    state: latest
+- name: Set favorites
+  shell: |
+    gsettings set org.gnome.shell favorite-apps "['hyper.desktop', 'google-chrome.desktop', 'org.gnome.Nautilus.desktop', 'code.desktop', 'intellij_idea.desktop', 'postman.desktop', 'evolution.desktop', 'rhythmbox.desktop']"
+  become_user: fedora
+- name: Set keyboard language
+  shell: |
+    gsettings set org.gnome.desktop.input-sources show-all-sources true
+    gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us+altgr-intl')]"
+    gsettings set org.gnome.desktop.input-sources current 0
+- name: Set formats
+  shell: |
+    gsettings set org.gnome.system.locale region  'de_DE.UTF-8'
+- name: Disable lock screen
+  shell: |
+    gsettings set org.gnome.desktop.lockdown disable-lock-screen true
+    gsettings set org.gnome.desktop.screensaver idle-activation-enabled false
+    gsettings set org.gnome.desktop.screensaver lock-enabled false
+  become_user: fedora
+- name: Create .themes directories
+  file:
+    path: "/home/fedora/.themes"
+    state: directory
+    owner: fedora
+- name: Install Gnome Shell Extension Jenkins
+  git:
+    repo: https://github.com/philipphoffmann/gnome3-jenkins-indicator.git
+    dest: ~/.local/share/gnome-shell/extensions/jenkins-indicator@philipphoffmann.de
+    force: yes
+  become_user: fedora
+- name: Enable Jenkins Shell Extension scheme & Configure Jenkins Indicator
+  shell: |
+    cp ~/.local/share/gnome-shell/extensions/jenkins-indicator@philipphoffmann.de/schemas/org.gnome.shell.extensions.jenkin
+s-indicator.gschema.xml /usr/share/glib-2.0/schemas
+    glib-compile-schemas /usr/share/glib-2.0/schemas/
+    gsettings set org.gnome.shell.extensions.jenkins-indicator settings-json '{"servers":[{"id":1,"name":"Default","jenkins_url":"https://ci.detss.corpintra.net/jenkins","green_balls_plugin":true,"autorefresh":true,"autorefresh_interval":5.2,"notification_finished_jobs":true,"stack_notifications":true,"show_running_jobs":true,"show_successful_jobs":true,"show_unstable_jobs":true,"show_failed_jobs":true,"show_neverbuilt_jobs":false,"show_disabled_jobs":false,"show_aborted_jobs":false,"jobs_to_show":"all","use_authentication":false,"auth_user":"","api_token":""}]}'
+- name: Enable extensions
+  shell: |
+    gsettings set org.gnome.shell enabled-extensions "['background-logo@fedorahosted.org', 'jenkins-indicator@philipphoffmann.de']"
+- name: Install adapta gtk theme
+  dnf:
+    name: adapta-gtk-theme
+    state: latest
+- name: Enable adapta gtk nokto theme
+  shell: | 
+    gsettings set org.gnome.desktop.interface gtk-theme 'Adapta-Nokto'
+- name: Remove Alt-F7 shortcut (because it overwrits Intellij Shortcut)
+  shell: |
+    gsettings set org.gnome.desktop.wm.keybindings begin-move []

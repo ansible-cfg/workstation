@@ -1,0 +1,5 @@
+- name: Download  Intellij config from gdrive
+  shell: |
+    mkdir -p /home/fedora/.IntelliJIdea2017.3/config
+    skicka download workstation/files/.IntelliJIdea2017.3/config /home/fedora/.IntelliJIdea2017.3/config
+  become_user: fedora

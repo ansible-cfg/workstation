@@ -1,0 +1,19 @@
+- name: Install ntpd
+  dnf:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+  - ntp
+  - ntpdate
+- name: Setup ntp server
+  lineinfile:
+    path: /etc/ntp.conf
+    regexp: '^server ntp1'
+    insertafter: '^pool'
+    line: "server {{ ntp.server }}"
+- name: Enable ntpd
+  systemd:
+    state: started
+    enabled: yes
+    daemon_reload: yes
+    name: ntpd
