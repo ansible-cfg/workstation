@@ -59,6 +59,8 @@ go:
     list:
     # - repo: istio.io/fortio
     #   bin: fortio
+    - repo: github.com/sbueringer/kubernetes-rbacq
+      bin: kubernetes-rbacq
     - repo: github.com/derekparker/delve/cmd/dlv
       bin: dlv
     - repo: github.com/erning/gorun
